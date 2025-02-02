@@ -1,68 +1,74 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <vector>
-using namespace std;
 
-class FileReader {
-public:
-    // Constructor to initialize with a file name
-    FileReader(const string& fileName) : fileName(fileName) {}
-
-    // Method to read and process file contents
-    void processFile() {
-        ifstream inputFile(fileName);
-
-        // Check if the file opened successfully
-        if (!inputFile) {
-            cerr << "Error: Could not open the file " << fileName << endl;
-            return;
-        }
-
-        string line;
-        cout << "Processing file contents:" << endl;
-
-        // Read the file line by line
-        while (getline(inputFile, line)) {
-            vector<int> values = parseLine(line);
-            int result = multiplyValues(values);
-            cout << "Line: " << line << " => Result: " << result << endl;
-        }
-
-        inputFile.close(); // Close the file
-    }
-
-private:
-    string fileName; // Name of the file to read
-
-    // Function to parse a line into integers
-    vector<int> parseLine(const string& line) {
-        vector<int> values;
-        stringstream ss(line);
-        int value;
-        while (ss >> value) {
-            values.push_back(value);
-        }
-        return values;
-    }
-
-    // Function to multiply values in a vector
-    int multiplyValues(const vector<int>& values) {
-        int result = 1;
-        for (int value : values) {
-            result *= value;
-        }
-        return result;
-    }
+struct GameSettings
+{
+    int iterations;
+    int width;
+    int height;
+    int numTeams;
+    int teamCapacity; // Single capacity for all teams
 };
 
-int main() {
-    string fileName = "/Users/testing/Documents/OOPDS/ASSGN/text.txt"; // Replace with your file name
-    FileReader fileReader(fileName);
+GameSettings readGameSettings(const std::string &filename)
+{
+    std::ifstream file(filename);
+    GameSettings settings;
 
-    // Process the file contents
-    fileReader.processFile();
+    if (file.is_open())
+    {
+        std::string line;
+
+        // Read Iterations
+        if (std::getline(file, line))
+        {
+            std::stringstream ss(line);
+            ss >> settings.iterations;
+        }
+
+        // Read Width and Height
+        if (std::getline(file, line))
+        {
+            std::stringstream ss(line);
+            ss >> settings.width >> settings.height;
+        }
+
+        // Read Number of Teams
+        if (std::getline(file, line))
+        {
+            std::stringstream ss(line);
+            ss >> settings.numTeams;
+        }
+
+        // Read Ship Capacity (Single capacity for all teams)
+        if (std::getline(file, line))
+        {
+            std::stringstream ss(line);
+            ss >> settings.teamCapacity;
+        }
+
+        file.close();
+    }
+    else
+    {
+        std::cerr << "Error: Unable to open file " << filename << std::endl;
+    }
+    return settings;
+}
+
+int main()
+{
+    std::string filename = "/Users/testing/Documents/OOPDS/warship_simulation/file.txt"; // Replace with your filename
+    GameSettings settings = readGameSettings(filename);
+
+    // Display the read settings
+    std::cout << "Iterations: " << settings.iterations << std::endl;
+    std::cout << "Width: " << settings.width << std::endl;
+    std::cout << "Height: " << settings.height << std::endl;
+    std::cout << "Number of Teams: " << settings.numTeams << std::endl;
+    std::cout << "Team Capacities: " << settings.teamCapacity << std::endl;
 
     return 0;
 }
